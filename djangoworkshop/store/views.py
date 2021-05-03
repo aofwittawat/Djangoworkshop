@@ -1,11 +1,11 @@
 from django.shortcuts import render
-
-
-# Create your views here.
+from store.models import Category, Product
 
 
 def index(request):
-    return render(request, 'index.html')
+    products = None
+    products = Product.objects.all().filter(available=True)
+    return render(request, 'index.html', {'products': products})
 
 
 def product(request):
