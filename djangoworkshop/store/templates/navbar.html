@@ -1,34 +1,57 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Store</a>
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'home' %}">Store</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+          {% if request.user.is_authenticated and request.user.first_name %}
+            <li class="nav-item">
+              <a class="nav-link">Welcome {{request.user.first_name}}</a>
+            </li>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'signout' %}">SignOut</a>
+            </li>
+          {% else %}
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
+            <a class="nav-link" href="{% url 'signup' %}">Register</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'signin' %}">SingIn</a>
+          </li>
+          {% endif %}
+
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Dropdown
+              Category
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
+              <li><a class="dropdown-item" href="{% url 'home' %}">สินค้าหมด</a></li>
+              <div class="dropdown-divider"></div>
+              {% for category in links %}
+              <li><a class="dropdown-item" href="{{category.get_url}}">{{category.name}}</a></li>
+              
+              {% endfor %}
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+            <a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'cartdetail' %}">
+                <i class="fas fa-shopping-cart"></i>&nbsp 
+                {% if item_count > 0 %}
+                    {{item_count}}
+                {% else %}
+                    0
+                {% endif %}
+            </a>
           </li>
         </ul>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="d-flex" action="{% url 'search' %}" method="GET">
+          <input class="form-control me-2" name="title" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
       </div>

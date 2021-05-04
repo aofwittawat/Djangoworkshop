@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'store',
+    'django.contrib.humanize',
+    'crispy_forms',
+    'stripe',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +72,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'store.context_processors.menu_links',
+                'store.context_processors.counter'
             ],
         },
     },
@@ -129,3 +134,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+PUBLIC_KEY = 'pk_test_51InLChD8CE2mxT4hEauQ91OG6IxB6lR9NhM1jRneILrsOua0KbIFPlJAeblZYO6V9SF5mSb0C9MwafHFlzyFkoNw00k8ihbWgu'
+SECRET_KEY = 'sk_test_51InLChD8CE2mxT4hSEMbzwHRgtbggWltcOPLwqJ5pUOWtIpBbKjVWzuTXqQWDsLpE7l6YYxmTKx7rTHryVq790r2007gstlaLB'

@@ -1,7 +1,29 @@
-{% extends 'layout.html' %}
+{% extends 'layout.html' %}{% load humanize %}
 
 {% block content %}
-<h2> Hello Product</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-2"></div>
+    <div class="col-lg-8">
+        <div class="card mt-4">
+            <img class="card-img-top img-fluid" src="{{product.image.url}}" alt="">
+            <div class="card-body">
+              <h3 class="card-title">{{product.name}}</h3>
+              <h4>{{product.price|intcomma}} บาท</h4>
+              <p class="card-text">{{product.description}}</p>
+              <div class="card-footer">
+                {% if product.stock <= 0 %}
+                <h5 class ="text-danger">สินค้าหมด</h5>
+      
+                {% else %}
+                <a href="{% url 'addCart' product.id %}" class="btn btn-primary">เพิ่มสินค้าลงตะกร้า</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+  </div>
+    </div>
+</div>
 
 
 

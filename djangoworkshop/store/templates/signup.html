@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}  {% block content %}{% load crispy_forms_tags %}
+<div class="container">
+    <h2 class="text-center mt-2">แบบลงทะเบียน</h2>
+    <form method ="post">
+        {% csrf_token %}
+        <p>{{form | crispy}}</p>
+        
+        <input type="submit" class="btn btn-primary" value="Register">
+    </form>
+</div>
+
+{% endblock %}

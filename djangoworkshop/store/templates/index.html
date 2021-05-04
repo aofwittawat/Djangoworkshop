@@ -1,4 +1,4 @@
-{% extends 'layout.html' %} {% load static %} {% block content %}
+{% extends 'layout.html' %} {% load static %} {% block content %}{% load humanize %}
 <div class="container">
   <div class="row my-3">
     {% for product in products %}
@@ -9,23 +9,38 @@
         /></a>
         <div class="card-body">
           <h4 class="card-title">
-            <a href="#">{{product.name}}</a>
+            <a href="{{product.get_url}}">{{product.name}}</a>
           </h4>
-          <h5>{{product.price}}</h5>
-          <p class="card-text">{{product.description}}</p>
+          <h5>{{product.price|intcomma}} บาท</h5>
+          <p class="card-text">{{product.description | slice:":150"}}</p>
         </div>
         <div class="card-footer">
           {% if product.stock <= 0 %}
           <h5 class ="text-danger">สินค้าหมด</h5>
 
           {% else %}
-          <a href="#" class="btn btn-primary">เพิ่มสินค้าลงตะกร้า</a>
+          <a href="{% url 'addCart' product.id %}" class="btn btn-primary">เพิ่มสินค้าลงตะกร้า</a>
           {% endif %}
         </div>
       </div>
     </div>
 
     {% endfor %}
+    <nav aria-label="pagination">
+      {% if products.paginator.num_pages > 1 %}
+      <ul class="pagination">
+        {% for page_number in products.paginator.page_range %}
+          <li class="page-item 
+            {% if products.number == page_number %}
+                active
+            {% endif %}
+            "><a class="page-link" href="?page={{page_number}}">{{page_number}}</a></li>
+        {% endfor %}
+        
+        
+      </ul>
+      {% endif %}
+    </nav>
   </div>
 </div>
 

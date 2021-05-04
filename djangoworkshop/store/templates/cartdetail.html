@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}{% load humanize %}{% load static %}
+
+{% block content %}
+<div class="container">
+    {% if not cart_items %}
+    <div class="alert alert-danger text-center my-5" role="alert">
+        คุณยังไม่มีสินค้าในตะกร้า
+    </div>
+
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-condensed">
+                <thead>
+                    <tr class="cart_menu">
+                        <td class="image">รายการสินค้า</td>
+                        <td class="description"></td>
+                        <td class="price">ราคา</td>
+                        <td class="quantity">จำนวน</td>
+                        <td class="total">รวม</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in cart_items %}
+                    <tr>
+                        <td class="cart_product">
+                            <a href="{{i.product.get_url}}"><img src="{{i.product.image.url}}" width="100px" height="80px"  alt=""></a>
+                        </td>
+                        <td class="cart_description">
+                            <h5><a href="{{i.product.get_url}}">{{i.product.name}}</a></h5>
+                        </td>
+                        <td class="cart_price">
+                            <p>{{i.product.price|intcomma}}</p>
+                        </td>
+                        <td class="cart_quantity">
+                                <p>{{i.quantity}}</p>
+                            </div>
+                        </td>
+                        <td class="cart_total">
+                            <p class="cart_total_price">{{i.sub_total|intcomma}}</p>
+                        </td>
+                        <td class="cart_delete">
+                            <a class="cart_quantity_delete" onclick="return confirm('คุณต้องการลบสินค้าออกจากตะกร้าหรือไม่?')" href="{% url 'removeCart' i.product.id %}"><i class="fa fa-times"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        
+        </div>
+    
+ 
+    <h4 class="text-end">ยอดชำระเงิน {{total|intcomma}} บาท</h4>
+    <form class="" action="" method="POST">
+        {% csrf_token %}
+        <script src="https://checkout.stripe.com/checkout.js"
+        class="stripe-button"
+        data-key="{{ data_key }}"
+        data-amount="{{ stripe_total }}"
+        data-name="Wittawat-Shop"
+        data-description="{{ description }}"
+        data-locale="Thailand"
+        data-currency="thb"
+        data-shipping-address="true"
+        data-billing-address="true"
+        data-zip-code="true">
+        </script>
+      </form>
+    {% endif %}
+  </div>
+
+  
+</div>
+
+
+
+
+
+
+
+{% endblock %}
