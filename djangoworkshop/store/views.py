@@ -87,10 +87,28 @@ def cartdetail(request):
             counter += item.quantity
     except Exception as e:
         pass
+###################ชำระเงิน ผ่าน stripe ###############################################
     stripe.api_key = settings.SECRET_KEY
     stripe_total = int(total * 100)
     description = "Payment Online"
     data_key = settings.PUBLIC_KEY
+    if request.method == "POST":
+        try:
+            token = request.POST['stripeToken']
+            email = request.POST['stripeEmail']
+            customer = stripe.Customer.create(
+                email= email,
+                source=token
+            )
+            charge = stripe.Charge.create(
+                amount= stripe_total,
+                currency = 'thb',
+                description = description,
+                customer = customer.id
+            )
+        except stripe.error.CardError as e:
+            return False, e
+####################################################################################
     return render(request, 'cartdetail.html', dict(cart_items=cart_items,
                                                    total=total,
                                                    counter=counter,
