@@ -20,6 +20,9 @@ urlpatterns = [
     path('account/login', views.signInview, name='signin'),
     path('account/logout', views.signOutview, name='signout'),
     path('search/', views.search, name='search'),
+    path('prderhistory/', views.orderHistory, name='orderHistory'),
+    path('order/<int:order_id>', views.viewOrder, name='orderdetail'),
+    path('cart/thankyou', views.thankyou, name='thankyou'),
 
 ]
 

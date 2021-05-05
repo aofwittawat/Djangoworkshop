@@ -1,0 +1,44 @@
+{% extends 'layout.html' %} {% load static %} {% block content %}{% load humanize %}
+<div class="container">
+  
+    {% if not orders %}
+    <div class="alert alert-danger text-center my-5" role="alert">
+        ไม่มีประวัติการสั่งซื้อสินค้า
+    </div>
+
+    {% else %}
+    <h2 class="text-center mt-5">ประวัติการสั่งซื้อ</h2>
+        <div class="table-responsive">
+            <table class="table table-condensed">
+                <thead>
+                    <tr class="cart_menu">                     
+                        <td>รหัสใบสั่งซื้อ</td>
+                        <td>วันสั่งซื้อสินค้า</td>
+                        <td>ยอดชำระเงิน</td>                    
+                        <td>ดูรายการ</td>                    
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in orders %}
+                    <tr>                
+                        <td class="cart_price">
+                            <p>{{item.id}}</p>
+                        </td>
+                        <td class="cart_quantity">
+                                <p>{{item.created | date:"d M Y"}}</p>
+                            </div>
+                        </td>
+                        <td class="cart_total">
+                            <p class="cart_total_price">{{item.total|intcomma}}</p>
+                        </td>                    
+                        <td class="cart_total">
+                            <a href="{% url 'orderdetail' item.id %}" class = "btn btn-warning btn-sm">ดูรายละเอียด</a>
+                        </td>                    
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+</div>
+{% endif %}
+
+{% endblock %}

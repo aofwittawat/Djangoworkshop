@@ -1,6 +1,6 @@
 from django.core import paginator
 from django.shortcuts import redirect, render, get_object_or_404
-from store.models import Category, Product, Cart, CartItem
+from store.models import Category, Product, Cart, CartItem, Order, OrderItem
 from store.form import SignUpForm
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.forms import AuthenticationForm
@@ -72,7 +72,7 @@ def addCart(request, product_id):
                                             cart=cart,
                                             quantity=1)
         cart_item.save()
-    return redirect('/')
+    return redirect('cartdetail')
 
 
 def cartdetail(request):
@@ -87,34 +87,70 @@ def cartdetail(request):
             counter += item.quantity
     except Exception as e:
         pass
-###################ชำระเงิน ผ่าน stripe ###############################################
+################### ชำระเงิน ผ่าน stripe ###############################################
     stripe.api_key = settings.SECRET_KEY
     stripe_total = int(total * 100)
     description = "Payment Online"
     data_key = settings.PUBLIC_KEY
     if request.method == "POST":
+        print(request.POST)
         try:
             token = request.POST['stripeToken']
             email = request.POST['stripeEmail']
+            name = request.POST['stripeBillingName']
+            address = request.POST['stripeBillingAddressLine1']
+            city = request.POST['stripeBillingAddressCity']
+            postcode = request.POST['stripeBillingAddressZip']
+            print(request.POST)
+
+            # ส่งค่าขึ้นหน้าเวป ผ่าน API token
             customer = stripe.Customer.create(
-                email= email,
+                email=email,
                 source=token
             )
             charge = stripe.Charge.create(
-                amount= stripe_total,
-                currency = 'thb',
-                description = description,
-                customer = customer.id
+                amount=stripe_total,
+                currency='thb',
+                description=description,
+                customer=customer.id
             )
+            # บันทึกรายชื่อ คนที่จ่ายเงินแล้วมาเป็นสมาชิก
+            order = Order.objects.create(
+                name=name,
+                address=address,
+                city=city,
+                postcode=postcode,
+                total=total,
+                email=email,
+                token=token
+            )
+            order.save()
+            # บันทึกรายการสั่งซื้อ
+            for item in cart_items:
+                order_item = OrderItem.objects.create(
+                    product=item.product.name,
+                    quantity=item.quantity,
+                    price=item.product.price,
+                    order=order
+                )
+                order_item.save()
+            # ลดจำนวนสินค้าใน Stock หลังจ่ายเงิน
+                product = Product.objects.get(id=item.product.id)
+                product.stock = int(
+                    item.product.stock - order_item.quantity)
+                product.save()
+                item.delete()
+            return redirect('home')
+
         except stripe.error.CardError as e:
             return False, e
 ####################################################################################
-    return render(request, 'cartdetail.html', dict(cart_items=cart_items,
-                                                   total=total,
-                                                   counter=counter,
-                                                   stripe_total=stripe_total,
-                                                   data_key=data_key,
-                                                   description=description))
+    return render(request, 'thankyou.html', dict(cart_items=cart_items,
+                                                 total=total,
+                                                 counter=counter,
+                                                 stripe_total=stripe_total,
+                                                 data_key=data_key,
+                                                 description=description))
 
 
 def removeCart(request, product_id):
@@ -143,7 +179,6 @@ def signupView(request):
             # จัดกลุ่ม
             customer_group = Group.objects.get(name='Customer')
             customer_group.user_set.add(singup_user)
-
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
@@ -176,3 +211,22 @@ def search(request):
     name = request.GET['title']
     products = Product.objects.filter(name__contains=name)
     return render(request, 'index.html', {'products': products})
+
+
+def orderHistory(request):
+    if request.user.is_authenticated:
+        email = str(request.user.email)
+        orders = Order.objects.filter(email=email)
+    return render(request, 'orders.html', {'orders': orders})
+
+
+def viewOrder(request, order_id):
+    if request.user.is_authenticated:
+        email = str(request.user.email)
+        order = Order.objects.get(email=email, id=order_id)
+        orderitem = OrderItem.objects.filter(order=order)
+    return render(request, 'orderdetail.html', {'order': order, 'orderitem': orderitem})
+
+
+def thankyou(request):
+    return render(request, 'thankyou.html')
