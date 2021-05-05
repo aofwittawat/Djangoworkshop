@@ -1,8 +1,8 @@
 {% extends 'layout.html' %} {% load static %} {% block content %}{% load humanize %}
 <div class="container">
-  <div class="row my-3">
+  <div class="my-3 row">
     {% for product in products %}
-    <div class="col-lg-4 col-md-6 mb-4">
+    <div class="mb-4 col-lg-4 col-md-6">
       <div class="card h-100">
         <a href="#"
           ><img class="card-img-top" src="{{product.image.url}}" alt=""
